@@ -1,0 +1,32 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Node modules (if any)
+node_modules/
+
+# Python cache (if any)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Build outputs
+dist/
+build/
+*.exe
+*.dll
+
+# Personal notes (uncomment if you want to exclude)
+# **/personal-notes.md
