@@ -1,243 +1,322 @@
-# AIDLC Adoption Roadmap for the Existing Project
+# AIDLC Implementation Roadmap for the Existing Project
 
-*Architecture and delivery plan | Project context: Polarion ALM, GitHub, Visual Studio with GitHub Copilot, Azure*
+*Prepared for Engineering Management | Project toolchain: Siemens Polarion ALM, GitHub, Visual Studio with GitHub Copilot, Azure*
 
-> **Planning placeholders:** `DATETIME-1` is the agreed program start/target date to be confirmed. `PERSON-1` is the named AIDLC coach or pilot facilitator for developer working sessions. `PERSON-2` is the project knowledge-transfer (KT) coordinator / nominated project SME. Replace these placeholders with names and dates during kickoff.
+> **Planning placeholders:** `DATETIME-1` is the program start/target date to confirm at kickoff. `PERSON-1` is the AIDLC coach/facilitator who will schedule and conduct working sessions with each developer. `PERSON-2` is the project KT coordinator and SME liaison. Replace placeholders with names and calendar dates before execution.
 >
-> **Decision principle:** AIDLC means an AI-enabled, evidence-driven SDLC—not removal of engineering accountability, required controls, or human approval. Copilot may accelerate work; people remain accountable for requirements, design decisions, acceptance, and release approval.
+> **Operating principle:** AIDLC is an AI-enabled evolution of the SDLC—not the removal of engineering accountability, existing approval controls, or human judgment. AI can assist with context gathering, planning, coding, testing, and traceability. People remain responsible for requirement interpretation, design decisions, review, acceptance, and release.
 
 ## 1. Executive summary
 
-This roadmap proposes a staged transition from the current SDLC to an AI-Driven Development Lifecycle (AIDLC) for the existing project. It uses the approved project toolchain—Polarion for requirements and test management, GitHub for source and delivery, Visual Studio with GitHub Copilot for development, and Azure for cloud services—while adding repeatable AI workflows, project-specific context, verification, and governance.
+This roadmap describes a staged transition from the project’s current SDLC to an AI-Driven Development Lifecycle (AIDLC), using the existing Polarion, GitHub, Visual Studio/Copilot, and Azure ecosystem. The intended outcomes are faster access to project context, less repetitive engineering effort, stronger requirement-to-code-to-test traceability, and additional capacity for prioritized modernization—without sacrificing quality, security, compliance, or release confidence.
 
-The rollout is deliberately tool- and vendor-neutral beyond the existing stack. It does **not** depend on Superpowers or another unapproved prompt/skill library. Instead, the team will define and maintain its own lightweight AIDLC playbook, repository instructions, reusable templates, and quality gates. Polarion integration will start with a security and capability assessment of available MCP implementations. A third-party MCP server is not an official Polarion product unless independently confirmed; if no implementation meets the project’s security, support, and functional requirements, the project will build a small, controlled adapter or defer write operations until it is approved.
+The initial draft proposed Superpowers as a cognitive discipline layer and a Polarion MCP server as the bridge to ALM data. This roadmap preserves those architectural ideas—structured planning, test-first development, focused Polarion context, and traceability—but does not assume approval of Superpowers or the availability/support of an official Polarion MCP server. The project will implement a small, project-owned AIDLC playbook and assess available MCP implementations. If none meets organizational requirements, the team can build a narrowly scoped adapter against supported Polarion APIs or use a manual workflow until integration is approved.
 
-The program will begin with knowledge transfer and baseline measurement, then run a limited pilot, evaluate evidence, and scale only when security, quality, usability, and business outcomes meet agreed acceptance criteria. Expected productivity gains are hypotheses to validate, not guaranteed outcomes.
+The rollout starts with existing-project knowledge transfer (KT) and baseline measurement, continues through governance and a bounded pilot, and scales only after evidence-based review. Numerical productivity targets will be set after measuring the current process. The success measure is useful capacity released while quality, security, and compliance guardrails remain effective—not AI usage or generated code volume.
 
-## 2. Objectives and success measures
+## 2. Business value: current and target state
 
-### Objectives
+| Capability | Current SDLC / basic AI assistance | Target AIDLC operating model |
+|---|---|---|
+| Requirement context | Developers navigate Polarion and manually transfer context, with risk of omissions or outdated information. | Developers work from approved Polarion items, confirm acceptance criteria and constraints, and use approved integration or a documented manual context workflow. |
+| Planning | Planning practices vary and project knowledge is unevenly distributed. | A lightweight, risk-proportionate plan is drafted with AI assistance and checked by the developer and relevant human approver before material work. |
+| Code and tests | AI may generate code without a consistent validation loop. | Developers use a project-owned Understand → Plan → Test → Implement → Verify loop; tests and deterministic CI provide evidence, with human review of code and tests. |
+| Traceability | Work-item, PR, commit, and test-result links may be manual or delayed. | Agreed identifiers and deterministic checks improve traceability; any Polarion write-back is authorized, audited, and subject to existing approval controls. |
+| Governance | People can miss workflow states or build from unapproved information. | Polarion permissions, GitHub protections, CI, and human approval remain enforcement points. AI instructions guide behavior but are not security controls. |
+| Onboarding | New team members rely on ad hoc access to project experts. | `PERSON-2` coordinates structured KT, maintains an index of authoritative project materials, and tracks demonstrated onboarding outcomes. |
+| Modernization capacity | Repetitive work and context switching consume engineering time. | The pilot measures whether AIDLC reduces avoidable effort; management directs any validated capacity toward prioritized modernization. |
 
-- Reduce avoidable time spent locating project context, drafting routine changes, and maintaining traceability.
-- Improve consistency of requirements-to-code-to-test evidence.
-- Make AI-assisted development safe, reviewable, reproducible, and compatible with existing Polarion/GitHub/Azure controls.
-- Free engineering capacity for modernization without reducing testing, review, security, or compliance rigor.
-- Bring new team members up to speed through structured KT and discoverable project knowledge.
+## 3. Goals, scope, and measures
 
-### Baseline and measures
+### Goals
 
-During the first two weeks, record current baselines and agree targets with Engineering Management, Product, QA, Security, and the team. Compare pilot work with a representative pre-pilot sample; account for task complexity and avoid using raw code volume as a productivity proxy.
+- Reduce avoidable time spent finding requirements, understanding code, drafting routine changes, and preparing traceability evidence.
+- Improve consistency of requirement-to-design-to-code-to-test evidence.
+- Provide every developer with AIDLC onboarding and practical working sessions with `PERSON-1`.
+- Give the recently joined architect and other new team members a structured understanding of the existing project through KT coordinated by `PERSON-2`.
+- Release engineering bandwidth for modernization only where measured outcomes support that conclusion.
+- Keep existing Polarion workflow, GitHub review, security, and release controls intact unless separately reviewed and approved.
+
+### Baseline and outcome measures
+
+During Weeks 1–2, Engineering Management, Product, QA, Security, and the delivery team will record current baselines and agree on target ranges. Compare like-for-like work where practical; account for task complexity and avoid treating lines of code, prompt counts, or AI adoption alone as productivity.
 
 | Measure | Suggested definition | Owner / cadence |
 |---|---|---|
-| Lead time | Work-item start to merged PR, segmented by work type | Engineering lead / sprint |
+| Lead time | Work-item start to merged PR, segmented by work type and size | Engineering lead / sprint |
 | Cycle time by activity | Time in clarification, implementation, review, rework, and test | Team / sprint |
-| First-pass quality | PRs accepted without a material rework cycle; pair with defect data | QA and engineering / sprint |
-| Escaped defects | Production or downstream defects attributable to shipped work | QA / release |
-| Test effectiveness | Relevant automated test coverage and failure detection, not coverage percentage alone | QA / sprint |
-| Traceability completeness | Sampled work items with valid links to PRs, commits, and test evidence where required | Polarion owner / sprint |
-| Developer experience | Short, voluntary survey on usefulness, friction, and cognitive load | `PERSON-1` / pilot checkpoint |
-| AI operating cost | License/model, Azure, hosting, support, and integration cost per active user or work item | FinOps / month |
-| Security and policy | Data exposure, policy exceptions, and security findings | Security / continuous |
+| First-pass quality | PRs accepted without material rework, considered alongside defect data | Engineering and QA / sprint |
+| Escaped defects | Downstream or production defects attributable to shipped work | QA / release |
+| Test effectiveness | Relevance and defect-detection value of tests, not coverage percentage alone | QA / sprint |
+| Traceability completeness | Sampled work items with valid PR, commit, and test evidence links where required | Polarion owner / sprint |
+| Developer experience | Voluntary feedback on usefulness, friction, review effort, and cognitive load | `PERSON-1` / pilot checkpoint |
+| KT effectiveness | Ability to locate and explain core architecture, workflow, and support information; completion of a low-risk onboarding task | `PERSON-2` / onboarding checkpoint |
+| AI operating cost | License/model, Azure, hosting, support, security, and integration costs per active user/work item where measurable | FinOps / month |
+| Security and policy | Exposure incidents, policy exceptions, access findings, and remediation | Security / continuous |
+| Service performance | Tool latency, error/timeout rate, rate-limit events, and CI duration | Platform owner / pilot and ongoing |
 
-Set numerical targets after the baseline. Do not claim a productivity improvement unless the data supports it and quality and security guardrails remain healthy.
+Do not claim improvement unless results support it and quality, security, and compliance guardrails remain healthy. Set numerical targets after the baseline and make scale/stop decisions using the full scorecard.
 
-## 3. Target operating model and architecture
+## 4. Target architecture and AIDLC workflow
 
-### Tool responsibilities
+### Toolchain responsibilities
 
-- **Polarion ALM:** Authoritative source for approved requirements, work-item state, test definitions/results, and formal traceability.
-- **GitHub:** Source control, issues/PRs as applicable, code review, branch protection, CI, and release evidence.
-- **Visual Studio + GitHub Copilot:** Developer-facing assistance for code navigation, explanation, test drafting, and implementation within organization policy and repository instructions.
-- **Azure:** Existing application hosting and, where approved, managed identity, Key Vault, monitoring, and AI/compute services. Select any model or Azure AI service only after architecture, privacy, procurement, and data-residency review.
-- **AIDLC playbook:** Project-owned workflow guidance, templates, and acceptance criteria. It may include repository custom instructions and approved Copilot configuration, but it is not treated as a security boundary or as a substitute for review.
-- **Polarion integration:** A narrowly scoped integration service/MCP server, if approved. MCP is a protocol, not a trust guarantee or an authorization system by itself.
+- **Polarion ALM — system of record:** Approved requirements, work-item state, test definitions/results, and formal traceability.
+- **GitHub — source and delivery workflow:** Code, branches, pull requests, code review, branch protection, CI, and release evidence.
+- **Visual Studio with GitHub Copilot — developer workbench:** Code navigation, explanation, planning support, test drafting, implementation assistance, and debugging, subject to organizational policy.
+- **Azure — cloud and operational platform:** Existing hosting and, where approved, managed identity, Key Vault, monitoring, networking, and AI/compute services. Any additional service requires architecture, security, privacy, procurement, and data-residency review.
+- **Project-owned AIDLC playbook — discipline and guidance:** Version-controlled instructions, templates, examples, checklists, and risk-based review expectations. It is not a security boundary and does not guarantee model behavior.
+- **Optional Polarion integration — controlled bridge:** An assessed community/vendor MCP implementation or a minimal project adapter. MCP is a protocol, not an authorization mechanism or guarantee of safety.
 
-### Proposed flow
+### Reference interaction flow
 
-1. A developer selects an approved Polarion work item and confirms its status, acceptance criteria, constraints, and out-of-scope items.
-2. The developer asks Copilot to summarize relevant context and propose a plan. The developer verifies that summary against Polarion and project sources; a human approves the plan before material implementation begins.
-3. The developer implements in a feature branch, using tests and existing project conventions. AI-generated code and tests are treated as suggestions and independently reviewed.
-4. Local checks and GitHub CI execute deterministic tests, static analysis, dependency/security scanning, and required policy checks.
-5. A human reviews the diff, test evidence, security implications, and traceability. The PR links to the Polarion item using an agreed, validated identifier format.
-6. Polarion updates occur only through approved identities and workflows. Initially, the integration may be read-only; any write action (such as creating/updating test results) requires explicit authorization, auditability, validation, and human confirmation where required.
-7. Existing release approval and deployment controls remain in force. AI does not merge or deploy to production autonomously.
+The following flow captures the useful intent of the initial draft while retaining human decision points and a manual fallback. The diagram does not imply that every step is automated or that an MCP server is already available.
 
-### AIDLC working loop (project-owned, library-independent)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Human as Product Owner / Developer / Reviewer
+    participant AI as Copilot in Visual Studio
+    participant Guide as Project AIDLC Playbook
+    participant Bridge as Approved Polarion Integration (optional)
+    participant POL as Polarion ALM
+    participant Dev as Developer Workbench / Tests
+    participant GH as GitHub / CI
+    participant AZ as Azure Runtime / Operations
 
-**Understand → Plan → Test → Implement → Verify → Review → Record.** The team will publish a short checklist and examples for each stage. The workflow should be followed proportionately to risk: small, low-risk changes need not incur heavyweight planning, while safety-, security-, privacy-, or compliance-sensitive changes require deeper review and explicit approvals. Instructions guide behavior but cannot guarantee that an AI model follows them.
+    Note over Human,AZ: 1. Understand and plan
+    Human->>AI: Request work using Polarion item ID
+    AI->>Guide: Apply project workflow, repository guidance, and risk checklist
+    alt Approved integration is available
+        AI->>Bridge: Request allowed work-item fields
+        Bridge->>POL: Read approved item using restricted identity
+        POL-->>Bridge: Return permitted status, criteria, constraints
+        Bridge-->>AI: Return bounded, validated context
+    else Integration is unavailable or not approved
+        Human->>POL: Open approved item and provide permitted context manually
+        POL-->>Human: Approved specification and constraints
+        Human->>AI: Supply only allowed, necessary context
+    end
+    AI->>Human: Draft summary, questions, risks, and implementation plan
+    Human->>Human: Verify against Polarion and project sources; approve or revise plan
 
-## 4. Polarion MCP / integration strategy
+    Note over Human,AZ: 2. Implement and verify
+    Human->>Dev: Create feature branch and select proportionate test strategy
+    AI->>Dev: Assist with tests, implementation, and debugging
+    Dev-->>Human: Local test and quality-check evidence
+    Human->>GH: Open PR with work-item link and review notes
+    GH->>GH: Run deterministic CI, security, and policy checks
+    GH-->>Human: Report checks and traceability validation
+    Human->>Human: Review diff, tests, security, and acceptance criteria
 
-Polarion has not been assumed to provide or officially support an MCP server. Before selecting or building one:
+    Note over Human,AZ: 3. Record and release under existing controls
+    opt Approved Polarion write-back is explicitly in scope
+        Human->>Bridge: Confirm allowed record update where required
+        Bridge->>POL: Validate identity, state, scope, and requested update
+        POL-->>Bridge: Record result and audit event
+        Bridge-->>Human: Report success or safe failure
+    end
+    Human->>GH: Approve/merge only under existing branch protections
+    GH->>AZ: Existing approved deployment workflow
+    Human->>POL: Complete required human review/signature and release evidence
+```
 
-1. **Discover and validate options:** Identify available community/vendor implementations and their provenance, license, maintainers, release history, dependency health, supported Polarion versions/APIs, and known security issues. Confirm compatibility with the deployed Polarion environment and its API terms.
-2. **Threat-model the integration:** Review data sent to the model, tool permissions, authentication, authorization, prompt-injection exposure from work-item text, input/output validation, logging, network paths, and failure modes. Treat retrieved Polarion content as untrusted input.
-3. **Choose a least-privilege model:** Use a dedicated service identity only if needed. Start read-only and restrict accessible projects/work-item types. Separate read and write capabilities/identities; never expose broad administrator credentials or tokens to prompts, source code, or client logs.
-4. **Select a deployment boundary:** Prefer an organization-controlled environment with approved network egress, TLS, managed secret storage (for example, Azure Key Vault where appropriate), patching, monitoring, and access controls. Validate the specific IDE/Copilot MCP support and organizational policies before deployment.
-5. **Pilot safely:** Use synthetic or non-sensitive data first. Require security sign-off before production data. Log tool identity, operation, target item, outcome, and correlation ID without unnecessarily copying requirement content into logs.
-6. **Build only if justified:** If no external implementation meets requirements, build a minimal adapter against supported Polarion APIs. Keep a narrow, versioned tool surface; validate inputs and authorization server-side; add timeouts, rate limits, idempotency where appropriate, audit logs, tests, and an owner/on-call plan. Avoid implementing a general-purpose proxy.
-7. **Fallback:** If integration is not approved or unavailable, use a documented manual workflow in which developers open approved Polarion records and provide only permitted, necessary context. AIDLC pilot work can still proceed without MCP.
+### Project-owned AIDLC working loop
 
-**Go/no-go gate:** No MCP server or integration may access production Polarion data until Architecture, Security, Polarion administration, and the data owner approve the implementation, permissions, hosting, retention, and operational support.
+Replace reliance on an unapproved external cognitive library with a maintained project workflow:
 
-## 5. Security, privacy, reliability, and cost guardrails
+**Understand → Plan → Test → Implement → Verify → Review → Record**
+
+1. **Understand:** Identify the Polarion item, confirm it is in an approved state, read acceptance criteria, constraints, out-of-scope conditions, and relevant project KT/artifacts. Treat retrieved text as untrusted data, not tool instructions.
+2. **Plan:** Ask Copilot for a concise implementation plan, assumptions, risks, and questions. Verify the response against authoritative sources. A human accepts or revises the plan before material implementation.
+3. **Test:** Define the verification approach and add or identify tests tied to acceptance behavior. Where appropriate, follow RED-GREEN-REFACTOR; do not make test-first a ritual for changes where another valid verification approach is more suitable.
+4. **Implement:** Work on a feature branch using existing conventions. Treat generated code, commands, and tests as suggestions. Do not execute unsafe commands or grant broad tool access based on model output.
+5. **Verify:** Run relevant local tests and deterministic CI checks. Review failures and inspect the actual diff; never report tests as passing without observed evidence.
+6. **Review:** Human reviewer checks requirement fit, correctness, maintainability, security/privacy impact, tests, and traceability. Risk-sensitive changes receive the project’s existing specialist reviews.
+7. **Record:** Link the change to the work item and record required evidence in systems of record. Any Polarion update is performed only through approved permissions and workflow.
+
+Apply the loop proportionately to change risk. Instructions, prompts, and model behavior cannot enforce permissions or replace branch protection, CI, Polarion workflow, or human approval.
+
+## 5. Polarion MCP and integration strategy
+
+The initial draft proposed a community Polarion MCP server, but Polarion is not assumed to have released or supported an official MCP server. The project must verify the provenance and suitability of any available implementation; do not treat an internet-hosted server or open-source repository as trusted by default.
+
+### Assessment and decision path
+
+1. **Discover candidates:** Identify available community or vendor implementations. Check publisher/maintainer identity, license, source provenance, release history, dependency health, issue response, supported Polarion versions, API terms, and support lifecycle.
+2. **Confirm compatibility:** Validate integration with the deployed Polarion version, authentication model, network topology, GitHub/Copilot environment, and Visual Studio capabilities approved by the organization.
+3. **Threat-model:** Review data sent to AI services, prompts and outputs, tool permissions, token handling, prompt-injection risks in requirements, logging, retention, network egress, and failure modes. Retrieved requirement text is untrusted input.
+4. **Start least-privilege and read-only:** Restrict accessible project/work-item types and fields. Separate read and write operations and identities where feasible. Do not use administrator credentials or put secrets in prompts, source code, or client logs.
+5. **Pilot with safe data:** Use synthetic or non-sensitive data first. Require Security, Architecture, Polarion administration, and data-owner approval before access to production Polarion data.
+6. **Build only when justified:** If candidates fail requirements, consider a minimal adapter against supported Polarion APIs. Use a narrow, versioned tool surface; server-side authorization and input validation; bounded outputs; timeouts/rate limits; audit logging; tests; ownership; patching; and incident support. Avoid a general-purpose proxy.
+7. **Keep a manual fallback:** If integration is unavailable or not approved, developers use Polarion directly and provide only permitted, necessary context. AIDLC adoption can proceed without MCP.
+
+**Go/no-go gate:** No MCP server or integration may access production Polarion data until Architecture, Security, Polarion administration, and the data owner approve the implementation, identity/permissions, hosting, retention, audit, and operating support. Write access to create or update test records is a later, separately approved capability—not a pilot assumption.
+
+## 6. Security, privacy, performance, reliability, and cost
 
 ### Security and privacy
 
-- Follow enterprise Copilot, GitHub, Azure, and data-classification policies. Confirm what prompts, code, requirements, telemetry, and outputs are retained or processed by each enabled service before using confidential or regulated data.
-- Classify project information and define allowed data categories for AI use. Minimize context; exclude credentials, secrets, personal data, and restricted content unless explicitly approved and protected by the relevant service configuration.
-- Enforce least privilege, SSO/MFA, managed identities where supported, short-lived credentials where possible, secret rotation, environment separation, and auditable access. Never put tokens in repository files or prompts.
-- Protect against prompt injection and unsafe tool execution: retrieved documents are data, not instructions; require allowlisted tools and operations, server-side authorization, validated parameters, bounded outputs, and human confirmation for consequential writes.
-- Maintain branch protection, required reviews, CI checks, dependency scanning, secret scanning, and approved release controls. AI output receives the same or greater scrutiny as human-authored output.
-- Establish an incident path for suspected data exposure, unsafe generated changes, compromised credentials, or incorrect ALM updates. Disable the affected integration quickly and preserve relevant audit evidence.
+- Confirm enterprise policies for GitHub Copilot, Visual Studio extensions, Azure services, repository content, prompts, telemetry, retention, and data residency before using project information.
+- Classify information and document allowed data categories. Minimize context; exclude credentials, secrets, personal data, and restricted content unless explicitly approved and protected by the relevant service configuration.
+- Enforce least privilege, SSO/MFA, managed identities where supported, environment separation, secret storage/rotation, network controls, and auditable access. Never commit tokens or paste them into prompts.
+- Treat Polarion items, code comments, issues, and retrieved documents as untrusted content. Do not allow embedded text to grant permissions, override policies, or trigger tools. Use allowlisted operations, server-side authorization, validated parameters, bounded outputs, and human confirmation for consequential writes.
+- Keep branch protection, mandatory human review, deterministic CI, dependency and secret scanning, and existing release approvals. AI-generated code and tests receive at least the same scrutiny as human-authored changes.
+- Define an incident process for suspected data exposure, unsafe generated changes, compromised credentials, or incorrect ALM updates. Revoke/disable the affected integration quickly and preserve relevant audit evidence.
 
 ### Performance and reliability
 
-- Measure end-to-end response latency, tool-call latency, timeout/error rates, rate limits, and CI duration during the pilot. Establish practical service objectives with users before scaling.
-- Use bounded context and retrieve only relevant Polarion items/files. Avoid sending entire repositories or broad requirement sets to the model by default.
-- Add timeouts, retries with backoff for transient failures, request limits, caching only where permitted and safe, and clear behavior when Copilot, Azure, GitHub, or Polarion is unavailable.
-- Do not make a model or MCP call a hard dependency for builds, deployments, or core application runtime. Developers must be able to complete approved work using the documented manual fallback.
-- Keep authoritative records and tests in systems of record; do not rely on model memory or unversioned chat history for project decisions.
+- Measure user-perceived response latency, Polarion/tool latency, timeout/error rates, rate limits, and CI duration. Agree practical service objectives with users before scaling.
+- Retrieve bounded, relevant context only; do not send whole repositories or broad requirement sets by default. Keep prompts and tool responses appropriately sized.
+- Implement timeouts, safe retry/backoff for transient failures, request limits, and safe handling for partial or stale responses. Cache only when allowed, secure, and correct for the data’s access and freshness requirements.
+- Do not make Copilot, a model, or MCP a hard dependency for builds, deployments, or application runtime. Maintain the documented manual fallback for outages and unsupported workflows.
+- Keep authoritative requirements, decisions, test results, and evidence in Polarion/GitHub or other designated systems of record—not in model memory or unversioned chat history.
 
 ### Cost management
 
-- Establish current Copilot licensing and Azure consumption ownership; identify any additional model, hosting, networking, logging, and support charges before pilot expansion.
-- Track active usage and cost by team/workflow where available, with privacy-aware aggregation. Set budgets/alerts and review consumption monthly.
-- Reduce waste through focused prompts, context minimization, reusable approved templates, and limiting expensive model or tool use to tasks that benefit from it.
-- Compare total cost of ownership—including engineering time for integration, patching, security reviews, and support—with measured time saved and quality outcomes. Stop or redesign features that add cost without evidence of value.
+- Identify current Copilot licensing and Azure consumption ownership; include model usage, hosting, networking, monitoring/logging, security review, integration engineering, support, and maintenance in total cost of ownership.
+- Track usage and cost by team/workflow where available using privacy-aware aggregation. Establish budgets, alerts, and monthly reviews before broad rollout.
+- Reduce waste with focused prompts, context minimization, reusable approved templates, and appropriate model/tool selection. Do not use AI where deterministic automation or a simple existing workflow is cheaper and safer.
+- Compare cost with measured time saved, review/rework impact, quality outcomes, and modernization capacity. Stop or redesign capabilities that add cost without evidence of value.
 
-## 6. Rollout plan
+## 7. Rollout plan
 
-The schedule below is relative to `DATETIME-1`; confirm durations and named owners at kickoff. Phases can overlap where governance permits, but gates must not be skipped.
+The calendar is relative to `DATETIME-1`; confirm actual dates, dependencies, and owner capacity at kickoff. Phase gates are mandatory even if activities overlap.
 
-### Phase 0 — Kickoff, discovery, and baseline (Weeks 1–2)
-
-**Activities**
-- Name the sponsor, product owner, engineering lead, QA lead, Security/Architecture contacts, Polarion administrator, GitHub administrator, FinOps contact, `PERSON-1` (AIDLC coach), and `PERSON-2` (KT coordinator/SME).
-- Map current SDLC from approved requirement through implementation, test, PR, release, and Polarion evidence. Identify mandatory regulatory/customer controls and the existing definition of done.
-- Capture productivity, quality, traceability, developer experience, latency, and cost baselines using the measures above.
-- Complete the KT inventory in Section 7; identify knowledge gaps, critical SMEs, and single points of failure.
-- Confirm Copilot entitlement, Visual Studio version/configuration, organization policy, Azure boundaries, data classification, and permitted AI usage.
-
-**Exit criteria**
-- Current-state workflow and system/data-flow diagrams reviewed by owners.
-- Baseline and pilot scope approved; sensitive-data rules documented.
-- KT sessions scheduled and project knowledge source locations identified.
-
-### Phase 1 — Guardrails and workflow design (Weeks 2–4)
+### Phase 0 — Kickoff, project discovery, KT, and baseline (Weeks 1–2)
 
 **Activities**
-- Publish the project AIDLC playbook: intake prompt template, context checklist, lightweight plan format, test/verification checklist, PR template, traceability format, and escalation/fallback path.
-- Configure repository instructions and approved Copilot settings. Keep instructions concise, version-controlled, and reviewed like code; avoid embedding secrets or relying on instructions for enforcement.
-- Define risk tiers and human approval points. Preserve existing Polarion state transitions, approvals, GitHub branch protection, and deployment gates.
-- Assess MCP candidates or decide on a manual/read-only first step. Complete threat model, architecture review, license review, and support ownership before any build or deployment.
-- Add or tune deterministic CI checks where gaps exist (tests, linting, static analysis, dependency/secret scanning, traceability validation). Do not use AI output as the sole compliance control.
+- Name the sponsor, Product Owner, engineering and QA leads, Architecture/Security contacts, Polarion and GitHub administrators, Azure platform owner, FinOps contact, `PERSON-1` (AIDLC coach), and `PERSON-2` (KT coordinator).
+- Map current SDLC from approved requirement through implementation, test, PR, release, and Polarion evidence. Identify customer/regulatory controls and existing definitions of done.
+- Start the KT program in Section 8. Inventory authoritative project materials, SMEs, knowledge gaps, and single points of failure.
+- Capture current productivity, quality, traceability, developer experience, latency, and cost baselines.
+- Confirm Copilot entitlement, Visual Studio configuration, organizational AI policy, Azure boundaries, information classification, and permitted data use.
 
 **Exit criteria**
-- Security, architecture, product, QA, and ALM owners approve pilot controls.
-- Playbook and repository configuration pass a small developer usability review.
-- MCP decision is recorded: approved candidate, controlled build proposal, or manual fallback.
+- Current-state workflow and system/data-flow diagrams reviewed by accountable owners.
+- Pilot scope, baseline measures, data rules, and decision owners agreed.
+- Core KT sessions scheduled and authoritative project knowledge locations identified.
 
-### Phase 2 — Controlled pilot and developer coaching (Weeks 4–8)
+### Phase 1 — AIDLC operating model and control design (Weeks 2–4)
 
-**Pilot scope**
-- Start with a representative but bounded team and low-to-medium-risk work items. Exclude high-impact production changes and restricted data until separately approved.
-- Each participating developer completes onboarding and at least one AIDLC working session with `PERSON-1` (or a delegated coach). Hold a recurring weekly clinic/office hour during the pilot; reserve time for individual developer pairing based on team capacity.
-- `PERSON-2` coordinates existing-project KT sessions (Section 7) and makes recordings/notes available only in approved repositories with the right access controls.
-- Use read-only Polarion retrieval only if integration has passed the security gate. Otherwise follow the manual context checklist.
-- Require human plan acceptance, code review, test evidence, and valid Polarion traceability. Test any Polarion write operation only in a non-production/test environment with explicit approval.
+**Activities**
+- Publish the project AIDLC playbook: intake/context checklist, plan format, test/verification guidance, PR/traceability expectations, risk tiers, and escalation/manual fallback.
+- Create concise, version-controlled repository instructions and approved Copilot settings. Review instruction changes like code; do not rely on them as enforcement.
+- Define human approval points and preserve Polarion state transitions, GitHub branch protection, electronic signatures, and deployment gates.
+- Decide whether the pilot uses manual Polarion context or proceeds to MCP assessment. Record architecture decision, data boundaries, and support ownership.
+- Add or tune deterministic CI checks where gaps exist: tests, linting, static analysis, dependency/secret scanning, and reliable traceability validation. Do not use an AI judgment as the sole compliance gate.
+
+**Exit criteria**
+- Product, QA, Security, Architecture, ALM, and platform owners approve pilot controls.
+- Playbook and repository guidance pass a developer usability review.
+- MCP path is documented as assessment, approved candidate, controlled build proposal, or manual fallback.
+
+### Phase 2 — Controlled pilot and coaching (Weeks 4–8)
+
+**Pilot scope and activities**
+- Select a bounded, representative team and low-to-medium-risk work items. Exclude high-impact production changes and restricted data unless separately authorized.
+- `PERSON-1` schedules and conducts at least one practical AIDLC working session with **each participating developer**, with follow-up pairing as needed. Hold a recurring weekly clinic/office hour during the pilot; reserve this time in team capacity.
+- `PERSON-2` coordinates existing-project KT sessions and makes approved notes, diagrams, decisions, and links discoverable to the intended audience.
+- Use Polarion integration only after the security gate; otherwise use the manual context checklist. Start with read-only access if approved. Test any write operation only in an approved non-production environment.
+- Require human plan acceptance, reviewed code/tests, passing required checks, and valid work-item traceability. Keep merge and deployment decisions human-governed.
 
 **Pilot evaluation**
-- Review measures each sprint, compare with baseline and a suitable non-pilot sample, and gather developer/QA feedback.
-- Record false starts, inaccurate summaries, rejected suggestions, rework, model/tool latency, policy exceptions, costs, and operational issues.
-- Adjust playbook and templates from evidence; do not tune for higher AI usage or code volume alone.
+- Review the scorecard each sprint and compare to baseline and a suitable non-pilot sample where feasible.
+- Collect developer and QA feedback; record rework, inaccurate summaries, rejected suggestions, tool latency, policy exceptions, costs, and operational issues.
+- Improve the playbook from evidence. Do not reward prompt counts or raw AI-generated code volume.
 
 **Exit criteria**
 - No unresolved critical security/compliance issue; required controls remain effective.
-- Pilot demonstrates acceptable usability and quality, with outcome evidence assessed against agreed targets.
-- Owners approve scale-up, extend pilot, redesign, or stop decision.
+- Pilot usability and quality meet agreed acceptance criteria; results are interpreted against the baseline.
+- Accountable owners decide to scale, extend, redesign, or stop.
 
-### Phase 3 — Expand and operationalize (Weeks 8–12 and ongoing)
+### Phase 3 — Incremental scale-up and operationalization (Weeks 8–12 and ongoing)
 
 **Activities**
-- Expand incrementally by team and work type, with onboarding and coaching capacity planned for every developer.
-- Harden approved Polarion integration for supportability: monitoring, alerting, patching, ownership, incident response, access recertification, API-version compatibility, and documented fallback.
-- Add automated traceability validation in GitHub CI where reliable identifiers and Polarion availability permit. Prefer deterministic validation and explicit exceptions over an AI judgment gate.
-- Review policy, costs, outcomes, and knowledge freshness monthly; reassess after major Copilot, Visual Studio, Polarion, or Azure changes.
-- Use freed capacity for prioritized modernization work selected by product/engineering leadership, and measure that work independently.
+- Expand by team and work type, with onboarding and coaching capacity planned for every developer.
+- Harden any approved Polarion integration: monitoring, alerting, patching, access recertification, API-version compatibility, incident response, operational ownership, and manual fallback.
+- Add deterministic GitHub CI traceability validation where identifiers and availability make it reliable; provide explicit exception handling rather than an AI-only gate.
+- Review cost, policy, outcomes, and KT freshness monthly; reassess after material Copilot, Visual Studio, Polarion, GitHub, or Azure changes.
+- Direct validated capacity toward modernization priorities selected by Product and Engineering Management; track that modernization work separately.
 
 **Scale criteria**
-- Quality and security guardrails are not worse than baseline; any change is understood and accepted by accountable owners.
-- Evidence supports a useful improvement in at least one agreed productivity outcome without unacceptable cost or developer burden.
-- Training, support, KT maintenance, and integration ownership can sustain the expanded cohort.
+- Quality and security guardrails are not worse than baseline, or any variance is understood and accepted by accountable owners.
+- Evidence supports a useful improvement in agreed productivity outcomes without unacceptable cost or developer burden.
+- Training, KT maintenance, integration support, and ownership are sustainable at the expanded scale.
 
-## 7. Existing-project knowledge transfer (KT)
+## 8. Existing-project knowledge transfer and onboarding
 
-Because the architect is new to the project, KT is a prerequisite—not an optional add-on. `PERSON-2` coordinates sessions with the relevant owners and maintains a project onboarding index linking to authoritative, access-controlled sources. The sessions below should be recorded as concise notes, diagrams, decisions, links, owners, and open questions; avoid creating duplicate or conflicting specifications.
+Because the architect recently joined the project, KT is a first-class workstream and a prerequisite to safe AIDLC adoption—not an optional add-on. `PERSON-2` coordinates sessions with the relevant owners and maintains an onboarding index linking to authoritative, access-controlled sources. Prefer updating existing artifacts over creating conflicting duplicate documentation.
 
-| KT session | Required topics | Suggested presenters | Output |
+| KT session | Topics to cover | Suggested presenters | Output |
 |---|---|---|---|
-| Product and business context | Users, business outcomes, product boundaries, priorities, domain terminology, success measures | Product owner / business SME | Context map, glossary, key journeys |
-| Polarion and requirements | Project structure, work-item types, states, approval rules, baselines, queries, test management, traceability conventions, API/version constraints | Polarion admin / BA / QA | Requirement-to-release workflow, access and data-classification notes |
-| Architecture and integrations | Context/container diagrams, major components, interfaces, data flows, identity, external dependencies, architecture decisions, known constraints | Solution architect / technical leads | Current architecture diagrams, ADR links, dependency map |
-| Codebase and developer workflow | Repository structure, branching, coding standards, build/run/debug, local environment, test suites, CI, release process | Senior developers / DevOps | Setup guide, build/test commands, contribution checklist |
-| Quality, test, and operations | Test strategy, environments, test data, defect patterns, observability, SLOs, incident history, rollback and support | QA lead / SRE / operations | Test/operational runbooks, quality risks, escalation routes |
-| Security, privacy, and compliance | Data classification, threat model, access controls, vulnerability process, audit evidence, retention, required approvals | Security / compliance / data owner | Approved AI-use boundaries and security requirements |
-| Azure and delivery platform | Subscriptions/resource groups, network boundaries, identity, Key Vault, monitoring, cost allocation, deployment and disaster recovery | Azure platform owner | Environment map, deployment/DR and cost ownership notes |
-| Roadmap and modernization | Current commitments, technical debt, modernization candidates, dependencies, constraints, decision process | Engineering manager / product owner | Prioritized opportunity list and dependency/risk log |
+| Product and business context | Users, outcomes, product boundaries, priorities, domain terminology, success measures, key journeys | Product Owner / business SME | Context map, glossary, journey links |
+| Polarion and requirements | Project structure, work-item types/states, approvals, baselines, queries, test management, traceability conventions, API/version constraints | Polarion admin / BA / QA | Requirement-to-release workflow and access notes |
+| Architecture and integrations | System/context diagrams, components, interfaces, data flows, identity, external dependencies, architecture decisions, constraints | Solution architect / technical leads | Current architecture and dependency map, ADR index |
+| Codebase and developer workflow | Repository structure, branching, coding standards, environment setup, build/run/debug, tests, CI, release process | Senior developers / DevOps | Setup guide, build/test commands, contribution checklist |
+| Quality, test, and operations | Test strategy, environments/data, defect patterns, observability, SLOs, incidents, rollback, support/escalation | QA lead / SRE / operations | Test and operational runbooks |
+| Security, privacy, and compliance | Data classification, threat model, access controls, vulnerability process, audit evidence, retention, approvals | Security / compliance / data owner | Approved AI-use boundaries and security requirements |
+| Azure and delivery platform | Subscriptions/resource groups, network boundaries, identity, Key Vault, monitoring, cost allocation, deployment, DR | Azure platform owner | Environment, deployment, DR, and cost map |
+| Roadmap and modernization | Commitments, technical debt, modernization candidates, dependencies, constraints, decision process | Engineering manager / Product Owner | Prioritized opportunity and risk log |
 
-**KT cadence and completion**
-- In Weeks 1–2, schedule the core sessions and identify which artifacts already exist; do not repeat sessions unnecessarily where authoritative materials are current.
-- Run a weekly 30–60 minute question clinic during the pilot, coordinated by `PERSON-2`; use asynchronous notes for questions that do not require a meeting.
-- Ask each new participant to complete a small, low-risk change using the documented setup and workflow, then capture gaps in the onboarding guide.
-- Track completion by role and topic, not attendance alone. Confirm the developer can find, explain, and apply key information.
-- Review KT material quarterly or after material architecture/process changes. Assign owners and review dates to diagrams and runbooks.
+### KT cadence and completion
 
-## 8. Roles and decision rights
+- In Weeks 1–2, `PERSON-2` inventories current material and schedules core sessions; reuse existing authoritative sessions and documents where current.
+- During the pilot, hold a weekly 30–60 minute question clinic coordinated by `PERSON-2`; use asynchronous notes for questions that do not need a meeting.
+- Each new participant completes a small, low-risk change using the documented environment and workflow. Capture onboarding gaps and update the guide.
+- Track completion by role and topic, not attendance alone. Confirm that people can locate, explain, and apply key information.
+- Assign owners and review dates to diagrams/runbooks; review quarterly and after material project changes.
+
+## 9. Roles and decision rights
 
 | Role | Accountability |
 |---|---|
-| Engineering sponsor/manager | Business outcomes, capacity, risk acceptance within authority, scale/stop decisions |
-| Product owner | Requirement quality and priority; confirms intended acceptance behavior |
-| `PERSON-1` AIDLC coach | Developer enablement, working sessions, playbook feedback, adoption friction |
-| `PERSON-2` KT coordinator | Existing-project KT plan, SME coordination, onboarding index and follow-up |
-| Developers | Verify context, make design choices, review AI suggestions, test changes, maintain traceability |
+| Engineering sponsor/manager | Business outcomes, capacity, scale/stop decision, and risk acceptance within authority |
+| Product Owner | Requirement priority and quality; confirms intended acceptance behavior |
+| `PERSON-1` AIDLC coach | Schedules and conducts developer sessions, supports safe workflow adoption, gathers feedback, and improves the playbook |
+| `PERSON-2` KT coordinator | Plans existing-project KT, coordinates SMEs, maintains onboarding index, and follows up on knowledge gaps |
+| Developers | Verify context, make design choices, review AI suggestions, test changes, maintain traceability, and remain accountable for submitted work |
 | QA lead | Test strategy and evidence quality; approves test-process changes |
 | Architecture/Security | Architecture and threat-model review, data/tool boundaries, integration approval |
-| Polarion administrator/data owner | ALM permissions, workflow and API constraints, record correctness |
-| GitHub/Azure platform owners | Platform policies, CI/CD, identity, monitoring, operational support |
-| FinOps | Cost baseline, budgets, alerts, value/cost review |
+| Polarion administrator/data owner | ALM permissions, workflow/API constraints, record correctness, and data access approval |
+| GitHub/Azure platform owners | Platform policy, CI/CD, identity, monitoring, support, and availability |
+| FinOps | Cost baseline, budgets/alerts, and value/cost review |
 
-## 9. Key risks and mitigations
+## 10. Key risks and mitigations
 
 | Risk | Mitigation |
 |---|---|
-| Unapproved or vulnerable community MCP implementation | Provenance, license, dependency, and security review; controlled deployment; read-only pilot; build a minimal adapter or use manual fallback |
-| Sensitive requirements or source code exposed to an unapproved service | Data classification, enterprise policy validation, context minimization, access restrictions, approved service configuration, audit and incident process |
-| AI produces incorrect code, tests, or requirement interpretation | Verify against authoritative sources; human plan/code review; deterministic tests and CI; risk-based review; no autonomous production release |
-| Traceability automation writes incorrect ALM records | Start read-only; validate IDs and states server-side; use test environment; narrow write scope, audit, idempotency, and human confirmation |
-| Prompt injection through work items, issues, or repository content | Treat retrieved content as untrusted data; do not follow embedded tool instructions; allowlist tools; constrain permissions and outputs |
-| Productivity measured incorrectly or gains do not materialize | Establish baseline, compare representative work, include rework/quality/cost, and use stop/adjust gates |
-| Tool outages, latency, or quotas interrupt development | Manual fallback, timeouts, rate limits, monitoring, and no dependency in build/runtime paths |
-| Knowledge concentrated in a few SMEs | KT index, recorded decisions, cross-training, named backups, periodic freshness reviews |
-| AI use adds review burden or erodes skills | Coach on verification, monitor developer feedback and review effort, retain fundamentals and ownership, adjust workflow |
+| Unapproved or vulnerable community MCP implementation | Verify provenance, license, dependencies, security, and support; use controlled hosting; start read-only; build a minimal adapter or retain manual fallback. |
+| Sensitive requirements or source code exposed to an unapproved service | Classify data, confirm service policy, minimize context, restrict access, approve configuration, and maintain incident response. |
+| Incorrect AI interpretation, code, tests, or commands | Verify against authoritative sources; human plan/code review; deterministic tests and CI; risk-based review; no autonomous production release. |
+| Incorrect Polarion writes or traceability | Begin read-only; validate identity, state, and scope server-side; test outside production; restrict/audit writes and require human confirmation where mandated. |
+| Prompt injection in requirements, issues, or repository content | Treat retrieved content as untrusted data; allowlist tools; constrain permissions and outputs; never let content override policies. |
+| Productivity claims unsupported or gains fail to materialize | Establish baseline; compare representative work; account for rework, quality, cost, and experience; use explicit stop/adjust gates. |
+| Latency, quotas, or outages disrupt work | Bounded requests, timeouts, monitoring, rate limits, and manual fallback; no hard dependency in build/runtime paths. |
+| Knowledge concentrated in a few SMEs | KT index, documented decisions, cross-training, backups, and freshness reviews. |
+| AI increases review burden or erodes skills | Coach on verification, measure review effort and feedback, retain engineering ownership, and adjust workflow. |
 
-## 10. Decisions required at kickoff
+## 11. Kickoff decisions and initial deliverables
 
-1. Confirm `DATETIME-1`, sponsor, pilot team, work-item scope, and delivery calendar.
-2. Assign actual owners for `PERSON-1` and `PERSON-2`, and agree their capacity for coaching and KT coordination.
-3. Approve the project-specific AI data classification and confirm Copilot/Azure service policies for the relevant information types.
-4. Confirm whether an MCP integration is in scope for the first pilot; authorize assessment only until the security gate is met.
-5. Agree baseline metrics, initial targets, review cadence, and who can approve scale/stop decisions.
-6. Confirm existing release, Polarion workflow, electronic signature, and audit controls that must remain unchanged.
-7. Prioritize modernization work that may use validated capacity released by the pilot.
+### Decisions required
 
-## 11. Recommended initial deliverables
+1. Confirm `DATETIME-1`, sponsor, pilot team, work-item scope, calendar, and delivery capacity.
+2. Assign actual owners and capacity for `PERSON-1` and `PERSON-2`.
+3. Approve project AI data classification and confirm Copilot/Azure policies for the relevant information types.
+4. Decide whether MCP assessment is in pilot scope; authorize assessment only until the security gate is met.
+5. Agree baseline metrics, initial targets, review cadence, and scale/stop decision-makers.
+6. Confirm existing Polarion workflow, signatures, GitHub protections, audit requirements, and release gates that must remain unchanged.
+7. Identify modernization priorities that may use validated capacity released by AIDLC.
 
-- Current-state AIDLC/SDLC workflow and system/data-flow diagrams.
-- Project AI-use and data-classification guidance approved by Security and data owners.
-- AIDLC playbook, prompt/context checklist, plan and PR templates, and human approval matrix.
-- KT schedule, onboarding index, architecture/dependency map, and open-question log.
+### Initial deliverables
+
+- Current-state SDLC/AIDLC workflow and system/data-flow diagrams.
+- Approved project AI-use and data-classification guidance.
+- Project AIDLC playbook, context checklist, plan/test/review templates, PR traceability format, and human approval matrix.
+- KT schedule, onboarding index, architecture/dependency map, and open-question/risk log.
 - Polarion MCP assessment and threat model, including a documented manual fallback.
-- Baseline dashboard and pilot scorecard covering quality, productivity, developer experience, traceability, security, latency, and cost.
+- Baseline dashboard and pilot scorecard covering quality, productivity, developer experience, traceability, security, performance, and cost.
+
+## 12. Recommendation
+
+Adopt AIDLC as a governed, AI-enabled evolution of the project SDLC. Preserve the intent of the original draft—requirements-first work, disciplined planning, TDD where appropriate, tool-assisted traceability, and HITL approval—while implementing the discipline in project-owned guidance rather than an unapproved library. Treat Polarion MCP as an integration option to assess, not a released Polarion capability. Start with KT, measurement, and a bounded pilot; scale only when evidence demonstrates value and security, quality, and compliance remain acceptable.
